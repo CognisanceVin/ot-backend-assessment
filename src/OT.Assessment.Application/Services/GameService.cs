@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using FluentResults;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OT.Assessment.Application.Common;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Game;
 using OT.Assessment.Domain.Entities;
@@ -21,7 +22,7 @@ namespace OT.Assessment.Application.Services
             _logger = logger;
         }
 
-        public async Task<Result<Guid>> CreateGame(GameDto dto)
+        public async Task<Result<GameDto>> CreateGame(GameDto dto)
         {
             try
             {
@@ -30,31 +31,46 @@ namespace OT.Assessment.Application.Services
 
                 if (!result)
                 {
-                    return Result.Fail("Failed to create new game.");
+                    return Result<GameDto>.Failure("Failed to create new game.");
                 }
 
-                return Result.Ok(game.Id);
+                return Result<GameDto>.Success(dto);
             }
             catch (DbUpdateException dbEx)
             {
-                _logger.LogError(dbEx, $"Failed to create game({dto.GameName}). Error: {dbEx.Message}");
-                return Result.Fail<Guid>($"A database error occurred when creating game: {dto.GameName}.");
+                _logger.LogError(dbEx, $"Failed to create game({dto.Name}). Error: {dbEx.Message}");
+                return Result<GameDto>.Failure($"A database error occurred when creating game: {dto.Name}.");
             }
         }
 
-        public Task<Guid> EditGame(CreateGameDto dto)
+        public Task<Guid> EditGame(GameDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CreateGameDto> GetGame(Guid Id)
+        public Task<GameDto> GetGame(Guid Id)
         {
             throw new NotImplementedException();
         }
-
-        public Task<IEnumerable<CreateGameDto>> GetGames()
+        public async Task<Result<IEnumerable<GameDto>>> GetGames()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var games = await _gameRepository.GetAllGames();
+
+                if (games is null)
+                {
+                    return Result<IEnumerable<GameDto>>.Failure("Failed to retrieve games.");
+                }
+                var mappedData = _mapper.Map<IEnumerable<GameDto>>(games);
+
+                return Result<IEnumerable<GameDto>>.Success(mappedData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving games.");
+                return Result<IEnumerable<GameDto>>.Failure("Failed to retrieve games.");
+            }
         }
     }
 }

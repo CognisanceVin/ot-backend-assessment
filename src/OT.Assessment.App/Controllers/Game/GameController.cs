@@ -7,6 +7,7 @@ namespace OT.Assessment.App.Controllers.Game
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     public class GameController : ControllerBase
     {
         private readonly IGameService _gameService;
@@ -28,8 +29,17 @@ namespace OT.Assessment.App.Controllers.Game
             var response = await _gameService.CreateGame(new GameDto
             {
                 GameCode = request.GameCode,
-                GameName = request.Name,
+                Name = request.Name,
             });
+
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("/getcasinogames")]
+        public async Task<IActionResult> GetGames()
+        {
+
+            var response = await _gameService.GetGames();
 
             return Ok(response);
         }

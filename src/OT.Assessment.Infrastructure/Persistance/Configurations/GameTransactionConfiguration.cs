@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OT.Assessment.Domain.Entities;
 
-namespace OT.Assessment.Infrastructure.Configurations
+namespace OT.Assessment.Infrastructure.Persistance.Configurations
 {
     internal class GameTransactionConfiguration : IEntityTypeConfiguration<GameTransaction>
     {

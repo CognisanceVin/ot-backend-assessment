@@ -9,6 +9,7 @@ namespace OT.Assessment.Application
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(typeof(GameProfile).Assembly);
+            services.AddAutoMapper(typeof(PlayerProfile).Assembly);
 
             return services;
         }

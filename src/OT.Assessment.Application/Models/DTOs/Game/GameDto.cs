@@ -3,7 +3,7 @@
     public class GameDto
     {
         public Guid Id { get; set; }
-        public string GameName { get; set; }
+        public string Name { get; set; }
         public string GameCode { get; set; }
     }
 }

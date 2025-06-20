@@ -5,9 +5,8 @@ namespace OT.Assessment.Domain.Entities
     public class Account : AuditTrackingBase
     {
 
-        public string BrandId { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string CountryCode { get; set; } = string.Empty;
-        public ICollection<Wager> Wagers { get; set; } = new List<Wager>();
+        public double Balance { get; set; } = default!;
+        public Player Player { get; set; }
+        public Guid PlayerId { get; set; }
     }
 }

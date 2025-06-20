@@ -1,17 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OT.Assessment.Application;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Services;
 using OT.Assessment.Domain.Interfaces.Repositories;
 using OT.Assessment.Infrastructure.Messaging.RabbitMq;
 using OT.Assessment.Infrastructure.Messaging.RabbitMq.Configs;
 using OT.Assessment.Infrastructure.Persistance;
-using OT.Assessment.Infrastructure.Persistance.Repositories;
+using OT.Assessment.Infrastructure.Repositories;
 
 namespace OT.Assessment.Infrastructure
 {
-    public static class LibraryRegistration
+    public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
@@ -24,6 +25,10 @@ namespace OT.Assessment.Infrastructure
             services.AddSingleton<RabbitMqPublisher>();
             services.AddScoped<IGameService, GameService>();
             services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

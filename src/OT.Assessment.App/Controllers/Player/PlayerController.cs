@@ -1,35 +1,62 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OT.Assessment.Application.Interfaces.Services;
+using OT.Assessment.Application.Models.DTOs.Player;
+using OT.Assessment.Application.Models.Request;
 using OT.Assessment.Application.Models.Requests;
 namespace OT.Assessment.App.Controllers.Player
 {
 
     [ApiController]
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     public class PlayerController : ControllerBase
     {
 
-        private readonly IGameService _gameService;
+        private readonly IPlayerService _playerService;
 
-        public PlayerController(IGameService gameService)
+        public PlayerController(IPlayerService playerService)
         {
-            _gameService = gameService;
+            _playerService = playerService;
         }
 
-        //GET api/player/
         [HttpGet]
+        [Route("/getplayers")]
         public async Task<IActionResult> GetPlayers()
         {
-            //var result = await _casinoWagerService.CreateWagerAsync(request);
-            return Ok();
+            var players = await _playerService.GetPlayers();
+            return Ok(players);
         }
 
-        //POST api/player
-        [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromBody] CreateCasinoWagerRequestModel request)
+        [HttpGet]
+        [Route("/getplayer")]
+        public async Task<IActionResult> GetPlayer([FromRoute] Guid id)
         {
-            //var result = await _casinoWagerService.CreateWagerAsync(request);
-            return Ok();
+            var player = await _playerService.GetPlayer(id);
+            return Ok(player);
+        }
+
+        [HttpPost]
+        [Route("/createplayer")]
+        public async Task<IActionResult> CreatePlayer([FromBody] CreatePlayerRequestModel request)
+        {
+            if (request is null)
+            {
+                return BadRequest();
+            }
+
+            var result = await _playerService.CreatePlayer(new PlayerDto
+            {
+                Firstname = request.FirstName,
+                Lastname = request.LastName,
+                Username = request.UserName,
+                CountryCode = request.CountryCode,
+                EmailAddress = request.EmailAddress
+            });
+
+            if (!result.IsSuccess)
+                return BadRequest(new { error = result.Error });
+
+            return Ok(result.Value);
         }
 
         //POST api/player/casinowager

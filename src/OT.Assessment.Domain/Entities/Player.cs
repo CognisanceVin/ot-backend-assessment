@@ -12,8 +12,8 @@ namespace OT.Assessment.Domain.Entities
         public string Lastname { get; set; } = default!;
 
         [Required]
-        public string Email { get; set; } = default!;
-
-        public ICollection<Account> Accounts { get; set; } = new List<Account>();
+        public string EmailAddress { get; set; } = default!;
+        public string CountryCode { get; set; }
+        public Account? Account { get; set; }
     }
 }

@@ -1,7 +1,9 @@
-﻿using OT.Assessment.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using OT.Assessment.Domain.Entities;
 using OT.Assessment.Domain.Interfaces.Repositories;
+using OT.Assessment.Infrastructure.Persistance;
 
-namespace OT.Assessment.Infrastructure.Persistance.Repositories
+namespace OT.Assessment.Infrastructure.Repositories
 {
     public class GameRepository : IGameRepository
     {
@@ -22,5 +24,9 @@ namespace OT.Assessment.Infrastructure.Persistance.Repositories
             return false;
         }
 
+        public async Task<IEnumerable<Game>> GetAllGames()
+        {
+            return await _context.Games.ToListAsync();
+        }
     }
 }

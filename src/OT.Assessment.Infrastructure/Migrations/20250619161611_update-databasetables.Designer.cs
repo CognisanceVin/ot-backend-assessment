@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OT.Assessment.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using OT.Assessment.Infrastructure.Persistance;
 namespace OT.Assessment.Infrastructure.Migrations
 {
     [DbContext(typeof(OTAssessmentDbContext))]
-    partial class OTAssessmentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250619161611_update-databasetables")]
+    partial class updatedatabasetables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,8 +31,15 @@ namespace OT.Assessment.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Balance")
-                        .HasColumnType("float");
+                    b.Property<string>("BrandId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -37,16 +47,22 @@ namespace OT.Assessment.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PlayerId")
+                    b.Property<Guid?>("PlayerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("Username");
 
                     b.ToTable("Accounts");
                 });
@@ -101,6 +117,10 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<Guid>("CasinoWagerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CasinoWagerWagerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CountryCode")
                         .IsRequired()
@@ -168,7 +188,7 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.HasIndex("AccountId1");
 
-                    b.HasIndex("CasinoWagerId");
+                    b.HasIndex("CasinoWagerWagerId");
 
                     b.HasIndex("CreatedDateTime");
 
@@ -196,27 +216,28 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Firstname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Lastname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmailAddress")
-                        .IsUnique();
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -226,9 +247,9 @@ namespace OT.Assessment.Infrastructure.Migrations
 
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Wager", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("WagerId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
@@ -242,7 +263,8 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<string>("CountryCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -262,14 +284,19 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<string>("GameName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("NumberOfBets")
                         .HasColumnType("int");
 
                     b.Property<string>("Provider")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("SessionData")
                         .IsRequired()
@@ -277,11 +304,13 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<string>("Theme")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TransactionId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TransactionTypeId")
                         .IsRequired()
@@ -292,28 +321,25 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("WagerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
+                    b.HasKey("WagerId");
 
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("CreatedDateTime");
+
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("Wagers");
                 });
 
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Account", b =>
                 {
-                    b.HasOne("OT.Assessment.Domain.Entities.Player", "Player")
-                        .WithOne("Account")
-                        .HasForeignKey("OT.Assessment.Domain.Entities.Account", "PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Player");
+                    b.HasOne("OT.Assessment.Domain.Entities.Player", null)
+                        .WithMany("Accounts")
+                        .HasForeignKey("PlayerId");
                 });
 
             modelBuilder.Entity("OT.Assessment.Domain.Entities.GameTransaction", b =>
@@ -324,7 +350,7 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.HasOne("OT.Assessment.Domain.Entities.Wager", "CasinoWager")
                         .WithMany()
-                        .HasForeignKey("CasinoWagerId")
+                        .HasForeignKey("CasinoWagerWagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -336,17 +362,22 @@ namespace OT.Assessment.Infrastructure.Migrations
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Wager", b =>
                 {
                     b.HasOne("OT.Assessment.Domain.Entities.Account", "Account")
-                        .WithMany()
+                        .WithMany("Wagers")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("OT.Assessment.Domain.Entities.Account", b =>
+                {
+                    b.Navigation("Wagers");
+                });
+
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Player", b =>
                 {
-                    b.Navigation("Account");
+                    b.Navigation("Accounts");
                 });
 #pragma warning restore 612, 618
         }
