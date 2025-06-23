@@ -4,6 +4,7 @@ using OT.Assessment.Application.Common;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Player;
 using OT.Assessment.Domain.Entities;
+using OT.Assessment.Domain.Entities.AuditTrail;
 using OT.Assessment.Domain.Interfaces.Repositories;
 
 namespace OT.Assessment.Application.Services
@@ -13,9 +14,14 @@ namespace OT.Assessment.Application.Services
         private readonly ILogger<PlayerService> _logger;
         private readonly IPlayerRepository _playerRepo;
         private readonly IAccountRepository _accountRepo;
+        private readonly ITransactionRepository _transactionRepo;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public PlayerService(IMapper mapper, ILogger<PlayerService> logger, IPlayerRepository playerRepository, IAccountRepository accountRepository,
+        public PlayerService(IMapper mapper,
+            ILogger<PlayerService> logger,
+            IPlayerRepository playerRepository,
+            IAccountRepository accountRepository,
+            ITransactionRepository transactionRepository,
         IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
@@ -23,6 +29,7 @@ namespace OT.Assessment.Application.Services
             _playerRepo = playerRepository;
             _accountRepo = accountRepository;
             _unitOfWork = unitOfWork;
+            _transactionRepo = transactionRepository;
         }
         public async Task<Result<Guid>> CreatePlayer(PlayerDto dto)
         {
@@ -57,6 +64,14 @@ namespace OT.Assessment.Application.Services
                     };
 
                     await _accountRepo.AddAccount(account);
+
+                    await _transactionRepo.AddRecord(new Transaction
+                    {
+                        EntityId = account.Id,
+                        EntityType = nameof(Account),
+                        Action = "Created",
+                        Metadata = $"Account created for player: {player.Id}."
+                    });
                 });
 
                 if (result.IsFailure)

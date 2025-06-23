@@ -7,5 +7,9 @@ namespace OT.Assessment.Domain.Entities
         public Guid AccountId { get; set; }
         public Guid GameId { get; set; }
         public double Amount { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public Account Account { get; set; }
+        public Game Game { get; set; }
     }
 }

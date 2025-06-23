@@ -1,43 +1,55 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Infrastructure Layer
 using OT.Assessment.Application;
 using OT.Assessment.Application.Common;
+using OT.Assessment.Domain.Interfaces.Repositories;
+using OT.Assessment.Infrastructure.Persistance;
 
-namespace OT.Assessment.Infrastructure.Persistance
+namespace OT.Assessment.Infrastructure.Persistence
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly OTAssessmentDbContext _context;
-        private readonly ILogger<UnitOfWork> _logger;
 
-        public UnitOfWork(OTAssessmentDbContext context, ILogger<UnitOfWork> logger)
+        public IPlayerRepository Players { get; }
+        public IAccountRepository Accounts { get; }
+        public IWagerRepository Wagers { get; }
+        public ITransactionRepository Transactions { get; }
+        public IGameRepository Games { get; }
+
+        public UnitOfWork(OTAssessmentDbContext context,
+                          IPlayerRepository playerRepository,
+                          IAccountRepository accountRepository,
+                          IWagerRepository wagerRepository,
+                          ITransactionRepository transactionRepository,
+                          IGameRepository gameRepository)
         {
             _context = context;
-            _logger = logger;
+            Players = playerRepository;
+            Accounts = accountRepository;
+            Wagers = wagerRepository;
+            Transactions = transactionRepository;
+            Games = gameRepository;
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
+
         public async Task<Result> ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default)
         {
             using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
             try
             {
-                await action(); // Perform repo actions
-                var affected = await _context.SaveChangesAsync(cancellationToken);
-
-                if (affected == 0)
-                    return Result.Failure("No changes were committed to the database.");
-
+                await action();
+                await _context.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
                 return Result.Success();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Transaction failed");
                 await transaction.RollbackAsync(cancellationToken);
-                return Result.Failure("Transaction failed: " + ex.Message);
+                return Result.Failure(ex.Message);
             }
         }
     }

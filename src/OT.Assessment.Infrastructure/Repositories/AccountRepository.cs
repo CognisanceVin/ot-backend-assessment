@@ -12,6 +12,12 @@ namespace OT.Assessment.Infrastructure.Repositories
         {
             _context = context;
         }
+
+        public async Task AccountTransaction(Account account)
+        {
+            _context.Accounts.Update(account);
+        }
+
         public async Task AddAccount(Account account)
         {
             await _context.Accounts.AddAsync(account);

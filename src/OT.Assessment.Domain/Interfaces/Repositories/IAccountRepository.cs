@@ -8,5 +8,6 @@ namespace OT.Assessment.Domain.Interfaces.Repositories
         Task<IEnumerable<Account>> GetAllAccounts();
         Task<Account> GetAccountByUserId(Guid Id);
         Task<Account> GetAccountById(Guid Id);
+        Task AccountTransaction(Account account);
     }
 }

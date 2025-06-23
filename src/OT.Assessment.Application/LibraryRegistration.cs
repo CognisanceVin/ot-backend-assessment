@@ -10,6 +10,7 @@ namespace OT.Assessment.Application
         {
             services.AddAutoMapper(typeof(GameProfile).Assembly);
             services.AddAutoMapper(typeof(PlayerProfile).Assembly);
+            services.AddAutoMapper(typeof(WagerProfile).Assembly);
 
             return services;
         }

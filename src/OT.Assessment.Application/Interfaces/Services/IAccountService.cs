@@ -3,9 +3,9 @@ using OT.Assessment.Application.Models.DTOs.Wager;
 
 namespace OT.Assessment.Application.Interfaces.Services
 {
-    public interface IWagerService
+    public interface IAccountService
     {
-        Task<Result> CreateWager(WagerDto dto);
-        Task<Result> ProcessWager(WagerDto dto);
+        Task<Result> GetPlayerAccount(Guid Id);
+        Task<Result> ProcessWager(WagerMessage dto);
     }
 }

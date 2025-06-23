@@ -5,5 +5,6 @@
         public Guid Id { get; set; }
         public string AccountNumber { get; set; }
         public Guid PlayerId { get; set; }
+        public double Balance { get; set; } = default!;
     }
 }

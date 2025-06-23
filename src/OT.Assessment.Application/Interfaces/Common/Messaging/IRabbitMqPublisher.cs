@@ -2,6 +2,6 @@
 {
     public interface IRabbitMqPublisher
     {
-        Task PublishMessage<T>(T message, string queue);
+        Task PublishMessage<T>(T message);
     }
 }

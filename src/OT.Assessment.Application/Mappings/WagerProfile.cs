@@ -3,14 +3,12 @@ using OT.Assessment.Application.Models.DTOs.Wager;
 
 namespace OT.Assessment.Application.Mappings
 {
-    public class WagerMappingProfile : Profile
+    public class WagerProfile : Profile
     {
-        public WagerMappingProfile()
+        public WagerProfile()
         {
-            CreateMap<WagerDto, WagerMessage>()
+            CreateMap<WagerDto, WagerMessage>().ReverseMap()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
-
-            CreateMap<WagerMessage, Wager>();
         }
     }
 }

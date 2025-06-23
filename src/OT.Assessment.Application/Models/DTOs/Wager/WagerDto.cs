@@ -5,6 +5,7 @@
         public Guid AccountId { get; set; }
         public Guid GameId { get; set; }
         public double Amount { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
     public class WagerMessage
     {

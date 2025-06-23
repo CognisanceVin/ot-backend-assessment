@@ -6,18 +6,17 @@ using OT.Assessment.Application.Common;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Game;
 using OT.Assessment.Domain.Entities;
-using OT.Assessment.Domain.Interfaces.Repositories;
 
 namespace OT.Assessment.Application.Services
 {
     public class GameService : IGameService
     {
         private readonly ILogger<GameService> _logger;
-        private readonly IGameRepository _gameRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public GameService(IGameRepository gameRepository, IMapper mapper, ILogger<GameService> logger)
+        public GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger)
         {
-            _gameRepository = gameRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
         }
@@ -27,7 +26,7 @@ namespace OT.Assessment.Application.Services
             try
             {
                 var game = _mapper.Map<Game>(dto);
-                var result = await _gameRepository.AddNewGame(game);
+                var result = await _unitOfWork.Games.AddNewGame(game);
 
                 if (!result)
                 {
@@ -56,7 +55,7 @@ namespace OT.Assessment.Application.Services
         {
             try
             {
-                var games = await _gameRepository.GetAllGames();
+                var games = await _unitOfWork.Games.GetAllGames();
 
                 if (games is null)
                 {
