@@ -9,8 +9,12 @@ namespace OT.Assessment.Infrastructure.Persistance.Configurations
         public void Configure(EntityTypeBuilder<Player> builder)
         {
             builder.HasKey(p => p.Id);
+            builder.Property(p => p.Id)
+              .ValueGeneratedOnAdd();
             builder.Property(p => p.Username).IsRequired();
             builder.Property(p => p.EmailAddress).IsRequired();
+
+
             builder.HasIndex(p => p.Username).IsUnique();
             builder.HasIndex(p => p.EmailAddress).IsUnique();
         }

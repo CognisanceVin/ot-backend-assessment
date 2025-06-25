@@ -5,6 +5,9 @@ namespace OT.Assessment.Domain.Interfaces.Repositories
     public interface IWagerRepository
     {
         Task<bool> AddWager(Wager wager);
-        //IUnitOfWork UnitOfWork { get; }
+
+        Task<IEnumerable<Wager>> GetPlayerWagers(Guid playerId);
+
+        Task<IEnumerable<Wager>> GetTopSpenders();
     }
 }

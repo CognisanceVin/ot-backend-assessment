@@ -32,7 +32,7 @@ namespace OT.Assessment.Application.Services
 
             await _unitOfWork.Wagers.AddWager(wager);
 
-            await _unitOfWork.Transactions.AddRecord(new Transaction
+            await _unitOfWork.Transactions.AddRecord(new TransactionRecord
             {
                 EntityId = wager.Id,
                 EntityType = nameof(Wager),

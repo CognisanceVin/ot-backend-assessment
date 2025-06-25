@@ -14,22 +14,22 @@ namespace OT.Assessment.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddRecord(Transaction record)
+        public async Task AddRecord(TransactionRecord record)
         {
             await _context.TransactionRecords.AddAsync(record);
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactionRecords()
+        public async Task<IEnumerable<TransactionRecord>> GetAllTransactionRecords()
         {
             return await _context.TransactionRecords.ToListAsync();
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionRecordsForEntity(string entity)
+        public async Task<IEnumerable<TransactionRecord>> GetTransactionRecordsForEntity(string entity)
         {
             return await _context.TransactionRecords.Where(i => i.EntityType == entity).ToListAsync();
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionRecordsForEntityRecord(string entity, Guid entityId)
+        public async Task<IEnumerable<TransactionRecord>> GetTransactionRecordsForEntityRecord(string entity, Guid entityId)
         {
             return await _context.TransactionRecords.Where(i => i.EntityType == entity && i.EntityId == entityId).ToListAsync();
         }

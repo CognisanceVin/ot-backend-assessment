@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OT.Assessment.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using OT.Assessment.Infrastructure.Persistance;
 namespace OT.Assessment.Infrastructure.Migrations
 {
     [DbContext(typeof(OTAssessmentDbContext))]
-    partial class OTAssessmentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250625112637_update-wager-trasacntion-table")]
+    partial class updatewagertrasacntiontable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,13 +31,8 @@ namespace OT.Assessment.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Balance")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -50,41 +48,34 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountNumber")
-                        .IsUnique();
-
                     b.HasIndex("PlayerId")
                         .IsUnique();
 
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("OT.Assessment.Domain.Entities.AuditTrail.TransactionRecord", b =>
+            modelBuilder.Entity("OT.Assessment.Domain.Entities.AuditTrail.Transaction", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("EntityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("EntityType")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
@@ -93,11 +84,9 @@ namespace OT.Assessment.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("EntityId");
 
-                    b.HasIndex("EntityType", "EntityId");
-
-                    b.ToTable("TransactionRecords", (string)null);
+                    b.ToTable("TransactionRecords");
                 });
 
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Game", b =>
@@ -187,9 +176,7 @@ namespace OT.Assessment.Infrastructure.Migrations
                         .HasColumnType("float");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
@@ -206,9 +193,7 @@ namespace OT.Assessment.Infrastructure.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("Id");
-
-                    b.ToTable("Wagers", (string)null);
+                    b.ToTable("Wagers");
                 });
 
             modelBuilder.Entity("OT.Assessment.Domain.Entities.Account", b =>
@@ -227,13 +212,13 @@ namespace OT.Assessment.Infrastructure.Migrations
                     b.HasOne("OT.Assessment.Domain.Entities.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OT.Assessment.Domain.Entities.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");

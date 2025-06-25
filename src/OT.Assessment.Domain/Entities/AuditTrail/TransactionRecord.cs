@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OT.Assessment.Domain.Entities.AuditTrail
 {
-    public class Transaction : AuditTrackingBase
+    public class TransactionRecord : AuditTrackingBase
     {
         [Key]
         public Guid EntityId { get; set; }

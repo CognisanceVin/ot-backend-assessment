@@ -1,34 +1,39 @@
-﻿//using Microsoft.EntityFrameworkCore;
-//using Microsoft.EntityFrameworkCore.Metadata.Builders;
-//using OT.Assessment.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using OT.Assessment.Domain.Entities;
 
-//namespace OT.Assessment.Infrastructure.Persistance.Configurations
-//{
-//    public class WagerConfiguration : IEntityTypeConfiguration<Wager>
-//    {
-//        public void Configure(EntityTypeBuilder<Wager> builder)
-//        {
-//            builder.HasKey(w => w.WagerId);
+namespace OT.Assessment.Infrastructure.Persistence.Configurations
+{
+    public class WagerConfiguration : IEntityTypeConfiguration<Wager>
+    {
+        public void Configure(EntityTypeBuilder<Wager> builder)
+        {
+            builder.ToTable("Wagers");
 
-//            builder.Property(w => w.WagerId)
-//                .IsRequired()
-//                .HasMaxLength(50);
+            builder.HasKey(w => w.Id);
 
-//            builder.Property(w => w.Theme).HasMaxLength(100);
-//            builder.Property(w => w.Provider).HasMaxLength(100);
-//            builder.Property(w => w.GameName).HasMaxLength(100);
-//            builder.Property(w => w.TransactionId).HasMaxLength(100);
-//            builder.Property(w => w.Username).HasMaxLength(100);
-//            builder.Property(w => w.CountryCode).HasMaxLength(10);
+            builder.Property(w => w.Id)
+                   .ValueGeneratedOnAdd();
 
-//            builder.HasIndex(w => w.TransactionId);
-//            builder.HasIndex(w => w.AccountId);
-//            builder.HasIndex(w => w.CreatedDateTime);
+            builder.Property(w => w.Amount)
+                   .IsRequired();
 
-//            builder.HasOne(w => w.Account)
-//                .WithMany(a => a.Wagers)
-//                .HasForeignKey(w => w.AccountId)
-//                .OnDelete(DeleteBehavior.Restrict);
-//        }
-//    }
-//}
+            builder.Property(w => w.CreatedAt)
+                   .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.HasOne(w => w.Account)
+                   .WithMany()
+                   .HasForeignKey(w => w.AccountId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(w => w.Game)
+                   .WithMany()
+                   .HasForeignKey(w => w.GameId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(w => w.Id);
+            builder.HasIndex(w => w.AccountId);
+            builder.HasIndex(w => w.GameId);
+        }
+    }
+}

@@ -22,7 +22,7 @@ public class BogusGenerator
            .RuleFor(o => o.Name, f => f.Commerce.ProductName())
            .RuleFor(o => o.Games, f => new Faker<Game>()
                                             .RuleFor(of => of.Name, ff => f.Commerce.ProductName())
-                                            .RuleFor(of => of.Theme, ff => ff.PickRandom(themes))
+                                            .RuleFor(of => of.GameCode, ff => ff.PickRandom(themes))
                                                 .Generate(10)).Generate(100);
 
         _testCasinoWagerFaker = new Faker<CasinoWager>()
@@ -33,7 +33,7 @@ public class BogusGenerator
             .RuleFor(o => o.GameName, (f, u) => f.PickRandom(testProviders.First(x => x.Name == u.Provider).Games).Name)
             .RuleFor(o => o.Theme,
                 (f, u) => f.PickRandom(testProviders.First(x => x.Name == u.Provider).Games
-                    .First(x => x.Name == u.GameName)).Theme)
+                    .First(x => x.Name == u.GameName)).GameCode)
             .RuleFor(o => o.TransactionId, () => Guid.NewGuid().ToString())
             .RuleFor(o => o.BrandId, () => Guid.NewGuid().ToString())
             .RuleFor(o => o.Username, f => f.PickRandom(testPlayers).Username.ToString())

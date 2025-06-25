@@ -2,11 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OT.Assessment.Application;
+using OT.Assessment.Application.Helpers;
+using OT.Assessment.Application.Interfaces.Common;
 using OT.Assessment.Application.Interfaces.Common.Messaging;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Services;
 using OT.Assessment.Domain.Interfaces.Repositories;
 using OT.Assessment.Infrastructure.Messaging.RabbitMq.Configs;
+using OT.Assessment.Infrastructure.Messaging.RabbitMq.Consumers;
 using OT.Assessment.Infrastructure.Messaging.RabbitMq.Publisher;
 using OT.Assessment.Infrastructure.Persistance;
 using OT.Assessment.Infrastructure.Persistence;
@@ -42,17 +45,21 @@ namespace OT.Assessment.Infrastructure
             services.AddSingleton<IConnection>(connection);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAccountNumberGenerator, AccountNumberGenerator>();
             services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
-            services.AddSingleton<IWagerService, WagerService>();
+            services.AddScoped<IWagerService, WagerService>();
             services.AddScoped<IWagerRepository, WagerRepository>();
+            services.AddScoped<IWagerProcessingService, WagerProcessingService>();
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();
 
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IGameRepository, GameRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddHostedService<WagerConsumerService>();
 
             return services;
         }

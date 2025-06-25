@@ -6,8 +6,9 @@ namespace OT.Assessment.Domain.Interfaces.Repositories
     {
         Task AddAccount(Account account);
         Task<IEnumerable<Account>> GetAllAccounts();
-        Task<Account> GetAccountByUserId(Guid Id);
+        Task<Account> GetAccountByPlayerId(Guid Id);
         Task<Account> GetAccountById(Guid Id);
         Task AccountTransaction(Account account);
+        Task<int> GetNumberOfAccountsCreatedToday();
     }
 }

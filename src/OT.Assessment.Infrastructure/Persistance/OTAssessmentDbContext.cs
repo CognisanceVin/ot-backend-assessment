@@ -11,7 +11,7 @@ namespace OT.Assessment.Infrastructure.Persistance
         public DbSet<Wager> Wagers { get; set; } = default!;
         public DbSet<Player> Players { get; set; } = default!;
         public DbSet<Game> Games { get; set; } = default!;
-        public DbSet<Transaction> TransactionRecords { get; set; }
+        public DbSet<TransactionRecord> TransactionRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

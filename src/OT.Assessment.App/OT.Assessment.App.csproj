@@ -21,8 +21,4 @@
 	  <ProjectReference Include="..\OT.Assessment.Infrastructure\OT.Assessment.Infrastructure.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Controllers\Account\" />
-	</ItemGroup>
-
 </Project>

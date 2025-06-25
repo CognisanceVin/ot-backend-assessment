@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OT.Assessment.Application.Common;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Game;
 using OT.Assessment.Domain.Entities;
+using OT.Assessment.Domain.Entities.AuditTrail;
+using OT.Assessment.Domain.Interfaces.Repositories;
 
 namespace OT.Assessment.Application.Services
 {
@@ -14,32 +14,52 @@ namespace OT.Assessment.Application.Services
         private readonly ILogger<GameService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger)
+        private readonly IGameRepository _gameRepository;
+        private readonly ITransactionRepository _transactionRepository;
+        public GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger, IGameRepository gameRepository, ITransactionRepository transactionRepository)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _gameRepository = gameRepository;
+            _transactionRepository = transactionRepository;
         }
 
         public async Task<Result<GameDto>> CreateGame(GameDto dto)
         {
+            var game = _mapper.Map<Game>(dto);
+
+            var result = await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                await _gameRepository.AddNewGame(game);
+
+                await _transactionRepository.AddRecord(new TransactionRecord
+                {
+                    Id = Guid.NewGuid(),
+                    EntityId = dto.Id,
+                    EntityType = nameof(Game),
+                    Action = "Create",
+                    Metadata = $"Created a new game {dto.Name}"
+                });
+            });
+
+            if (result.IsFailure)
+            {
+                _logger.LogError(result.Error, "Transaction failed when adding a new game.");
+                return Result<GameDto>.Failure(result.Error!);
+            }
+
             try
             {
-                var game = _mapper.Map<Game>(dto);
-                var result = await _unitOfWork.Games.AddNewGame(game);
-
-                if (!result)
-                {
-                    return Result<GameDto>.Failure("Failed to create new game.");
-                }
-
+                await _unitOfWork.SaveChangesAsync();
                 return Result<GameDto>.Success(dto);
             }
-            catch (DbUpdateException dbEx)
+            catch (Exception ex)
             {
-                _logger.LogError(dbEx, $"Failed to create game({dto.Name}). Error: {dbEx.Message}");
-                return Result<GameDto>.Failure($"A database error occurred when creating game: {dto.Name}.");
+                _logger.LogError(ex, "An error has occured while attempting to create a new game.");
+                return Result<GameDto>.Failure($"An error occured while creating new game");
             }
+
         }
 
         public Task<Guid> EditGame(GameDto dto)
@@ -68,7 +88,7 @@ namespace OT.Assessment.Application.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving games.");
-                return Result<IEnumerable<GameDto>>.Failure("Failed to retrieve games.");
+                return Result<IEnumerable<GameDto>>.Failure("An error occurred while retrieving games.");
             }
         }
     }

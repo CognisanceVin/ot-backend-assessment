@@ -7,5 +7,7 @@ namespace OT.Assessment.Application.Interfaces.Services
     {
         Task<Result> CreateWager(WagerDto dto);
         Task<Result> ProcessWager(WagerDto dto);
+        Task<Result<PaginatedList<WagerDto>>> GetPlayerWagers(Guid playerId, int page, int pageSize);
+        Task<List<PlayerSpendingDto>> GetTopSpenders(int count);
     }
 }

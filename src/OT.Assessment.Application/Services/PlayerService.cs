@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using OT.Assessment.Application.Common;
+using OT.Assessment.Application.Interfaces.Common;
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Player;
 using OT.Assessment.Domain.Entities;
@@ -17,11 +18,13 @@ namespace OT.Assessment.Application.Services
         private readonly ITransactionRepository _transactionRepo;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountNumberGenerator _accountNumberGenerator;
         public PlayerService(IMapper mapper,
             ILogger<PlayerService> logger,
             IPlayerRepository playerRepository,
             IAccountRepository accountRepository,
             ITransactionRepository transactionRepository,
+            IAccountNumberGenerator accountNumberGenerator,
         IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
@@ -30,6 +33,7 @@ namespace OT.Assessment.Application.Services
             _accountRepo = accountRepository;
             _unitOfWork = unitOfWork;
             _transactionRepo = transactionRepository;
+            _accountNumberGenerator = accountNumberGenerator;
         }
         public async Task<Result<Guid>> CreatePlayer(PlayerDto dto)
         {
@@ -51,7 +55,7 @@ namespace OT.Assessment.Application.Services
 
                 var player = _mapper.Map<Player>(dto);
 
-
+                var accNo = await _accountNumberGenerator.GenerateAccountNumber();
 
                 var result = await _unitOfWork.ExecuteInTransactionAsync(async () =>
                 {
@@ -60,12 +64,21 @@ namespace OT.Assessment.Application.Services
                     var account = new Account
                     {
                         PlayerId = player.Id,
-                        Balance = 0
+                        Balance = 0,
+                        AccountNumber = accNo
                     };
 
                     await _accountRepo.AddAccount(account);
 
-                    await _transactionRepo.AddRecord(new Transaction
+                    await _transactionRepo.AddRecord(new TransactionRecord
+                    {
+                        EntityId = dto.Id,
+                        EntityType = nameof(Player),
+                        Action = "Created",
+                        Metadata = $"Created a new player."
+                    });
+
+                    await _transactionRepo.AddRecord(new TransactionRecord
                     {
                         EntityId = account.Id,
                         EntityType = nameof(Account),
@@ -76,15 +89,25 @@ namespace OT.Assessment.Application.Services
 
                 if (result.IsFailure)
                 {
+                    _logger.LogError(result.Error, "Transaction failed when adding a player game.");
                     return Result<Guid>.Failure(result.Error!);
                 }
 
-                return Result<Guid>.Success(player.Id);
+                try
+                {
+                    await _unitOfWork.SaveChangesAsync();
+                    return Result<Guid>.Success(player.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error has occured while attempting to deposit money into account.");
+                    return Result<Guid>.Failure("An error occurred while processing the deposit.");
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to create player. Error: {ex.Message}");
-                return Result<Guid>.Failure($"A database error occurred when creating player.");
+                _logger.LogError(ex, "An error has occured while attempting to create a player.");
+                return Result<Guid>.Failure("An error occurred while creating player.");
             }
         }
 

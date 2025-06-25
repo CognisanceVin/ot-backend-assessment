@@ -28,14 +28,24 @@ namespace OT.Assessment.Infrastructure.Repositories
             return await _context.Accounts.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public Task<Account> GetAccountByUserId(Guid id)
+        public async Task<Account> GetAccountByPlayerId(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Accounts.FirstOrDefaultAsync(a => a.PlayerId == id);
         }
 
         public Task<IEnumerable<Account>> GetAllAccounts()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<int> GetNumberOfAccountsCreatedToday()
+        {
+            var today = DateTime.UtcNow.Date;
+            var tomorrow = today.AddDays(1).Date;
+
+            return await _context.Accounts
+                .Where(a => a.CreatedAt >= today && a.CreatedAt < tomorrow)
+                .CountAsync();
         }
     }
 }

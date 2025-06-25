@@ -7,6 +7,7 @@ namespace OT.Assessment.Domain.Entities
 
         public double Balance { get; set; } = default!;
         public Player Player { get; set; }
+        public string AccountNumber { get; set; }
         public Guid PlayerId { get; set; }
     }
 }

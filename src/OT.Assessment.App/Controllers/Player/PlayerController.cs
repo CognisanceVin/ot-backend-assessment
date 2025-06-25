@@ -2,41 +2,38 @@
 using OT.Assessment.Application.Interfaces.Services;
 using OT.Assessment.Application.Models.DTOs.Player;
 using OT.Assessment.Application.Models.Request;
-using OT.Assessment.Application.Models.Requests;
+
 namespace OT.Assessment.App.Controllers.Player
 {
-
-    [ApiController]
     [Route("api/[controller]")]
-    [ApiVersion("1.0")]
+    [ApiController]
     public class PlayerController : ControllerBase
     {
 
         private readonly IPlayerService _playerService;
+        private readonly IWagerService _wagerService;
 
-        public PlayerController(IPlayerService playerService)
+        public PlayerController(IPlayerService playerService, IWagerService wagerService)
         {
             _playerService = playerService;
+            _wagerService = wagerService;
         }
 
-        [HttpGet]
-        [Route("/getplayers")]
+        [HttpGet("getplayers")]
         public async Task<IActionResult> GetPlayers()
         {
             var players = await _playerService.GetPlayers();
             return Ok(players);
         }
 
-        [HttpGet]
-        [Route("/getplayer")]
-        public async Task<IActionResult> GetPlayer([FromRoute] Guid id)
+        [HttpGet("getplayer/{playerId}")]
+        public async Task<IActionResult> GetPlayer([FromRoute] Guid playerId)
         {
-            var player = await _playerService.GetPlayer(id);
+            var player = await _playerService.GetPlayer(playerId);
             return Ok(player);
         }
 
-        [HttpPost]
-        [Route("/createplayer")]
+        [HttpPost("createplayer")]
         public async Task<IActionResult> CreatePlayer([FromBody] CreatePlayerRequestModel request)
         {
             if (request is null)
@@ -59,30 +56,25 @@ namespace OT.Assessment.App.Controllers.Player
             return Ok(result.Value);
         }
 
-        //POST api/player/casinowager
-        [HttpPost]
-        [Route("/casinowager")]
-        public async Task<IActionResult> CreateCasinoWager([FromBody] CreateCasinoWagerRequestModel request)
+        [HttpGet("{playerId}/casino")]
+        public async Task<IActionResult> GetPlayerWagers([FromRoute] Guid playerId, [FromQuery] int pageSize = 10, [FromQuery] int page = 1)
         {
-            //var result = await _casinoWagerService.CreateWagerAsync(request);
-            return Ok();
+            if (page <= 0 || pageSize <= 0)
+                return BadRequest("Invalid page number and page size.");
+
+
+            var result = await _wagerService.GetPlayerWagers(playerId, page, pageSize);
+
+            return Ok(result);
         }
 
-        //GET api/player/{playerId}/wagers
-        [HttpGet]
-        [Route("/{playerId}/wager")]
-        public async Task<IActionResult> GetPlayerWagers([FromRoute] string playerId)
+        [HttpGet("topSpenders")]
+        public async Task<IActionResult> GetTopSpenders([FromQuery] int count)
         {
-            //var result = await _casinoWagerService.CreateWagerAsync(request);
-            return Ok();
-        }
+            if (count <= 0)
+                return BadRequest("Count must be greater than 0.");
 
-        //GET api/player/topSpenders?count=10
-        [HttpGet]
-        [Route("/topSpenders")]
-        public async Task<IActionResult> GetTopSpenders([FromQuery] string count)
-        {
-            List<CreateCasinoWagerRequestModel> result = new List<CreateCasinoWagerRequestModel>();
+            var result = await _wagerService.GetTopSpenders(count);
             return Ok(result);
         }
     }
